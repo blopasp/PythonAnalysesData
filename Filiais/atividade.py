@@ -34,8 +34,8 @@ ativ = """
 # funcao para extrair base do servidor
 def consulta(query):
 	
-	server = 'cosmos' 
-	database = 'cosmos_v14b' 
+	server = server
+	database = database
 
 	con = o.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database) 
 	cursor = con.cursor()
