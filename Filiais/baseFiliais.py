@@ -1,9 +1,12 @@
 import sqlite3
 
-#criando conexão com o banco
-con = sqlite3.connect("C:\\Estudos\\Resumo Filiais\\base\\FiliaisData.db")
+con = sqlite3.connect("C:\\Estudos\\Resumo Filiais\\base\\baseFilial2.db")
 
-cursor = con.cursor()
+def comando(query):
+    con = sqlite3.connect("C:\\Estudos\\Resumo Filiais\\base\\baseFilial2.db")
+    cursor = con.cursor()
+    cursor.execute(query)
+    con.commit()
 
 base_FilialRegiao = """
 CREATE TABLE IF NOT EXISTS FilialRegiao (
@@ -15,12 +18,7 @@ CREATE TABLE IF NOT EXISTS FilialRegiao (
 );
 """
 
-
-#Criando tabela Filial localizacao
-cursor.execute(base_FilialRegiao)
-
-#Criando tabela Filial Resumo
-cursor.execute("""
+base_FilialResumo = """
 CREATE TABLE IF NOT EXISTS FilialResumo (
     Filial INTEGER,
     SitLoja TEXT NOT NULL,
@@ -35,10 +33,9 @@ CREATE TABLE IF NOT EXISTS FilialResumo (
     ValorEstoqueAtual REAL NOT NULL,
     DataAtualizacao TEXT NOT NULL
 );
-""")
+"""
 
-#Criando tabela Filial atividade
-cursor.execute("""
+base_FilialAtividade = """
 CREATE TABLE IF NOT EXISTS FilialAtividade (
     Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     Filial INTEGER NOT NULL,
@@ -49,7 +46,11 @@ CREATE TABLE IF NOT EXISTS FilialAtividade (
     ValorVenda REAL NOT NULL,
     CONSTRAINT fk_atividade_regiao FOREIGN KEY(id) references FilialRegiao (id)
 );
-""")
+"""
+
+comando(base_FilialRegiao)
+comando(base_FilialResumo)
+comando(base_FilialAtividade)
 
 '''
 cursor.execute("""

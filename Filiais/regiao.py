@@ -3,11 +3,6 @@ import pyodbc as o
 import baseFiliais as bf
 
 # Conectando ao banco de dados ====
-server = 'cosmos' 
-database = 'cosmos_v14b' 
-
-conn = o.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database) 
-curs = conn.cursor()
 
 # Query regiao
 regiao = """
@@ -35,24 +30,54 @@ FL.FILI_CD_FILIAL,
 	EST.REGIAO
 """
 #Fazendo consulta no banco de dados
-base_regiao = pd.read_sql(regiao, conn)
 
-bf.cursor.execute("""
-drop table FilialRegiao;
+def consulta(query):
+    
+    server = 'cosmos'
+    database = 'cosmos_v14b'
+    
+    con = o.connect('DRIVER={SQL SERVER};SERVER='+server+';DATABASE='+database)
+    cursor = con.cursor()
+    base = pd.read_sql(query, con)
+    print("============== Base extraída com sucesso!")
+    return base
+
+def insertData(string, base):
+    
+	insert = """
+		INSERT INTO {}{} VALUES(""".format(string,tuple(base.columns))
+
+	for i in range(len(tuple(base.columns))):
+		if i != (len(tuple(base.columns))-1):
+			insert = insert+"'{}',"
+		else:
+			insert = insert+"'{}')\n"
+
+	if len(base) != 0:
+		concat = ","+insert.split(sep = ("VALUES"))[len(insert.split(sep = ("VALUES")))-1]
+
+		for index, row in base.iterrows():
+			insert = insert.format(*row)
+			break
+
+		for index, row2 in base.iterrows():
+			if index == 0:
+				continue
+			insert = insert+concat.format(*row2)
+        
+		bf.comando(insert)
+        
+		return print("******** Dados inseridos com sucesso! ********")
+    
+	else:
+		return print("#### BASE VAZIA! ####")
+
+bf.comando("""
+DELETE FROM FilialRegiao;
 """)
 
-bf.cursor.execute(bf.base_FilialRegiao)
+base_regiao = consulta(regiao)
+insertData("FilialRegiao", base_regiao)
 
-#inserindo dados para o banco
-a=0
-for i in range(len(base_regiao)):
-	insert = """
-	INSERT INTO FilialRegiao(Filial, Cidade, UF, Regiao, BRICK) VALUES('{Filial}', \'{Cidade}\', '{UF}', '{Regiao}', '{BRICK}')
-	""".format(Filial=base_regiao['Filial'][a], Cidade=base_regiao['Cidade'][a], UF=base_regiao['UF'][a], Regiao=base_regiao['Regiao'][a], BRICK=base_regiao['BRICK'][a])
-	
-	bf.cursor.execute(insert)
-	bf.con.commit() 
-	
-	print("dados %d inserido com sucesso" %a)
-	a+=1
+
 	

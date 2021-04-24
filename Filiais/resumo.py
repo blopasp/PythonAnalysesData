@@ -1,11 +1,13 @@
 import pandas as pd
 import pyodbc as o
 import baseFiliais as bf
+import gc
 from datetime import date
+
 
 # Query resumo
 resumo = """
-	SELECT 
+	SELECT top 10
 	CAST(PF.FILI_CD_FILIAL AS NUMERIC) AS Filial,
 	FL.FILI_FL_SITUACAO AS SitLoja,
 	NIVEL1.CAPN_DS_CATEGORIA AS NIVEL1,
@@ -70,9 +72,66 @@ def consulta(query):
 	cursor = con.cursor()
 	base = pd.read_sql(query, con)
 
+	print("============== Base extraída com sucesso")
 	return base
 
 # funcao para testar data de atualizacao
+def shiftBase(base):
+    
+    ints = base.select_dtypes(include=['int64','int32','int16']).columns
+    base[ints] = base[ints].apply(pd.to_numeric, downcast='integer')
+
+    floats = base.select_dtypes(include=['float']).columns
+    base[floats] = base[floats].apply(pd.to_numeric, downcast='float')
+
+    lista = list(base.columns)
+
+    for i in range(len(lista)):
+        
+        if True == list(base.columns.str.startswith('Data' or 'DT'))[i]:
+            base[lista[i]] = pd.to_datetime(base[lista[i]], errors = 'coerce')
+    
+    del lista
+
+    objects = base.select_dtypes('object').columns
+    base[objects] = base[objects].apply(lambda x: x.astype('category'))
+  
+    gc.collect()
+    
+	print("============== Tpos de dados melhorados com sucesso")
+
+    return base
+
+def insertData(string, base):
+    
+	insert = """
+		INSERT INTO {}{} VALUES(""".format(string,tuple(base.columns))
+
+	for i in range(len(tuple(base.columns))):
+		if i != (len(tuple(base.columns))-1):
+			insert = insert+"'{}',"
+		else:
+			insert = insert+"'{}')\n"
+
+	if len(base) != 0:
+		concat = ","+insert.split(sep = ("VALUES"))[len(insert.split(sep = ("VALUES")))-1]
+
+		for index, row in base.iterrows():
+			insert = insert.format(*row)
+			break
+
+		for index, row2 in base.iterrows():
+			if index == 0:
+				continue
+			insert = insert+concat.format(*row2)
+        
+		bf.comando(insert)
+        
+		return print("******** Dados inseridos com sucesso! ********")
+    
+	else:
+		return print("#### BASE VAZIA! ####")
+
 def test(base):
 	
 	base['DataAtualizacao'] = pd.to_datetime(base['DataAtualizacao'])
@@ -83,37 +142,17 @@ def test(base):
 	test = data_max['dataMax'].max()
 
 	if (test != dataAtualizacaoMax):
-		mes = "OK"
 		return True
 	else:
-		mes = "Dados de hoje já adicionados ao banco"
 		return False
 
-# funcao para inserir dados para o banco
-def insertDados(string, base):
-	
-	message = test(base)
-
-	if message(base):
-
-		a=0
-		for i in range(len(base)):
-			insert = string.format(aa = base['Filial'][a], b = base['SitLoja'][a], c = base['NIVEL1'][a], d = base['NIVEL2'][a], e = base['SKUTotal'][a], f = base['SKUAtivo'][a], g = base['SKUDesativado'][a], h = base['EstoqueAlvo'][a], i = base['QtdeUndFac'][a], j = base['QtdeEstoqueAtual'][a], k = base['ValorEstoqueAtual'][a], l = base['DataAtualizacao'][a])
-			
-			bf.cursor.execute(insert)
-			bf.con.commit()
-
-			print("dados %d inserido com sucesso" %a)
-			a + = 1
-
-		return print("Dados inseridos com sucesso!")
-
-	else:
-		return message
-
+# consultando dados no banco
 base_resumo = consulta(resumo)
+base_resumo = shiftBase(base_resumo)
 
-dados_FR = """
-INSERT INTO FilialResumo(Filial, SitLoja, NIVEL1, NIVEL2, SKUTotal, SKUAtivo, SKUDesativado, EstoqueAlvo, QtdeUndFac, QtdeEstoqueAtual, ValorEstoqueAtual, DataAtualizacao) VALUES('{aa}', \'{b}\', \'{c}\', '{d}', '{e}', '{f}', '{g}', '{h}', '{i}', '{j}', '{k}', '{l}')
-"""
-insertDados(dados_FR, base_resumo)
+# teste para verificar se os dados do dia já foi atualizado
+# caso verdadeiro que não foi adicionado dados de hoje, chama a função de inserir dados
+if test(base_resumo):
+	insertData("FilialResumo", base_resumo)
+else:
+	print("************ Dados de hoje já adicionados ************")
