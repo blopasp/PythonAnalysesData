@@ -81,8 +81,8 @@ def insertData(string, base):
 
 def test(base):
 	
-	base['DataAtualizacao'] = pd.to_datetime(base['DataAtualizacao'])
-	dataAtualizacaoMax = base['DataAtualizacao'].max()
+	base = pd.to_datetime(base)
+	dataAtualizacaoMax = base.max()
 
 	data_max = pd.read_sql("select max(DataAtualizacao) as dataMax from FilialResumo;", bf.con)
 	data_max.dataMax = pd.to_datetime(data_max['dataMax'])
@@ -99,7 +99,7 @@ base_resumo = shiftBase(base_resumo)
 
 # teste para verificar se os dados do dia já foi atualizado
 # caso verdadeiro que não foi adicionado dados de hoje, chama a função de inserir dados
-if test(base_resumo):
+if test(base_resumo['DataAtualizacao']):
 	insertData("FilialResumo", base_resumo)
 else:
 	print("************ Dados de hoje já adicionados ************")
