@@ -1,0 +1,1 @@
+C:\Users\113024\AppData\Local\Programs\Python\Python39\python "C:\Users\113024\Desktop\LOGIN\index.py"
