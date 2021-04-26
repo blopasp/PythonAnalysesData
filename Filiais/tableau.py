@@ -6,10 +6,10 @@ import sqlite3
 
 CONFIG = {
     'my_env': {
-        'server': 'https://tableau.pmenos.com.br',
+        'server': 'site',
         'api_version': '3.7',
-        'username': '113024@pmenos.com.br',
-        'password': 'Pab.2021',
+        'username': 'email',
+        'password': 'senha',
         'site_name': '',
         'site_url': ''
     }
