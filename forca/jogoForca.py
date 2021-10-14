@@ -71,5 +71,6 @@ def main():
         print('\nTente novamente!')
 
 if __name__ == "__main__":
+    
     import random
     main()

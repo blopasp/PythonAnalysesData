@@ -1,15 +1,11 @@
-from tableauhyperapi import (HyperProcess, Connection, TableDefinition, SqlType,
-                             Telemetry, Inserter, CreateMode, TableName)
-from tableau_api_lib import TableauServerConnection
-import pandas as pd
-import sqlite3
+import sys
 
 CONFIG = {
     'my_env': {
         'server': 'site',
         'api_version': '3.7',
-        'username': 'email',
-        'password': 'senha',
+        'username': sys.argv[0],
+        'password': sys.argv[1],
         'site_name': '',
         'site_url': ''
     }
@@ -111,17 +107,24 @@ def connTableau(config, saida, base, name):
 
     conn.sign_out()
 
-# ==== Base Filial ====
-sainda_resumo = 'resumo_filial.hyper'
-baseFilial = consultBase(filial)
-connTableau(CONFIG, sainda_resumo, baseFilial, name = 'filialResumo')
+if __name__ == '__main__':
+    from tableauhyperapi import (HyperProcess, Connection, TableDefinition, SqlType,
+                             Telemetry, Inserter, CreateMode, TableName)
+    from tableau_api_lib import TableauServerConnection
+    import pandas as pd
+    import sqlite3
+    
+    # ==== Base Filial ====
+    sainda_resumo = 'resumo_filial.hyper'
+    baseFilial = consultBase(filial)
+    connTableau(CONFIG, sainda_resumo, baseFilial, name = 'filialResumo')
 
-# ==== Base Atividade ====
-saida_atividade = 'atividade_filial.hyper'
-baseAtividade = consultBase(atividade)
-connTableau(CONFIG, saida_atividade, baseAtividade, name = 'filialAtividade')
+    # ==== Base Atividade ====
+    saida_atividade = 'atividade_filial.hyper'
+    baseAtividade = consultBase(atividade)
+    connTableau(CONFIG, saida_atividade, baseAtividade, name = 'filialAtividade')
 
-# ==== Base Regiao ====
-saida_regiao = 'regiao_filial.hyper'
-baseRegiao = consultBase(regiao)
-connTableau(CONFIG, saida_regiao, baseRegiao, name = 'filialRegiao')
+    # ==== Base Regiao ====
+    saida_regiao = 'regiao_filial.hyper'
+    baseRegiao = consultBase(regiao)
+    connTableau(CONFIG, saida_regiao, baseRegiao, name = 'filialRegiao')

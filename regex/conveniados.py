@@ -1,9 +1,4 @@
-import fitz
-import re
-from fitz.utils import write_text
-import pandas as pd
-
-CAMINHO_PDF = "arquivos_entrada/Gmail - INDICAÇÃO DE LOCAL REFERENCIADO.pdf"
+CAMINHO_PDF = "regex/arquivos_entrada/Gmail - INDICAÇÃO DE LOCAL REFERENCIADO.pdf"
 
 def write_txt_list(list, filename):
     with open(filename, 'w') as f:
@@ -18,18 +13,23 @@ def extract_from_pdf(path_filename):
     return text
 
 if __name__ == '__main__':
+    import fitz
+    import re
+    from fitz.utils import write_text
+    import pandas as pd
+
     # extraindo texto do arquivo pdf
     texto = extract_from_pdf(CAMINHO_PDF)
 
     # Salvando arquivo original para um arquivo txt
-    with open('arquivos_saida/conveniado.txt', 'a') as conv:
+    with open('regex/arquivos_saida/conveniado.txt', 'a') as conv:
         conv.write(texto)
 
     # procurando padrao nos bairros e nas quantidades de ocorrencias
     bairros = re.findall(r'[A-Z][A-Z ]+\B\W\d{1,2}\W', texto)
 
     # salvando bairros para um arquivo txt
-    write_txt_list(bairros, 'arquivos_saida/bairros.txt')
+    write_txt_list(bairros, 'regex/arquivos_saida/bairros.txt')
 
     # Procurando padrao para encontrar conveniada, endereco, complemento e bairro
     conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(|\s\W\d*)(\s\W\s[A-Z][A-Z ]+)', texto)
@@ -54,4 +54,4 @@ if __name__ == '__main__':
 
     # Reordenando as colunas e salvando o arquivo
     df = df[['Conveniado', 'Endereco', 'Numero', 'Complemento', 'Cidade']]
-    df.to_csv('arquivos_saida/Conveniado.csv', index=False)
+    df.to_csv('regex/arquivos_saida/Conveniado.csv', index=False)
