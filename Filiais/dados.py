@@ -41,7 +41,7 @@ def insertData(string, base):
         return print("#### BASE VAZIA! ####")
 
 
-base_FilialRegiao = """
+Regiao = """
 CREATE TABLE IF NOT EXISTS FilialRegiao (
     Filial INTEGER PRIMARY KEY,
     Cidade TEXT NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS FilialRegiao (
 );
 """
 
-base_FilialResumo = """
+Resumo = """
 CREATE TABLE IF NOT EXISTS FilialResumo (
     Filial INTEGER,
     SitLoja TEXT NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS FilialResumo (
 );
 """
 
-base_FilialAtividade = """
+Atividade = """
 CREATE TABLE IF NOT EXISTS FilialAtividade (
     Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     Loja INTEGER NOT NULL,
@@ -81,9 +81,9 @@ CREATE TABLE IF NOT EXISTS FilialAtividade (
 );
 """
 
-comando(base_FilialRegiao)
-comando(base_FilialResumo)
-comando(base_FilialAtividade)
+comando(Regiao)
+comando(Resumo)
+comando(Atividade)
 
 '''
 cursor.execute("""

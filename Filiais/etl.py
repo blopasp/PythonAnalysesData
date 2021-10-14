@@ -58,7 +58,7 @@ if __name__ == '__main__':
     
     # ETL base de atividade
     base_ativ = shiftBase(consulta(sys.argv[3]))
-    bf.insertData("FilialAtividade", base_ativ)
+    bf.insertData("Atividade", base_ativ)
     
     # ETL base de resumo
     base_resumo = shiftBase(consulta(sys.argv[4]))
@@ -66,14 +66,14 @@ if __name__ == '__main__':
     # teste para verificar se os dados do dia já foi atualizado
     # caso verdadeiro que não foi adicionado dados de hoje, chama a função de inserir dados
     if test(base_resumo['DataAtualizacao']):
-        bf.insertData("FilialResumo", base_resumo)
+        bf.insertData("Resumo", base_resumo)
     else:
         print("************ Dados de hoje já adicionados ************")
 
     # ETL base de regiao
     bf.comando("""
-    DELETE FROM FilialRegiao;
+    DELETE FROM Regiao;
     """)
     
-    base_regiao = consulta(regiao)
-    bf.insertData("FilialRegiao", base_regiao)
+    base_regiao = consulta(sys.argv[5])
+    bf.insertData("Regiao", base_regiao)

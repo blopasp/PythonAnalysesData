@@ -12,13 +12,13 @@ CONFIG = {
 }
 
 filial = """
-    select * from FilialResumo;
+    select * from Resumo;
 """
 atividade = """
-    select * from FilialAtividade
+    select * from Atividade
 """
 regiao = """
-    select * from FilialRegiao
+    select * from Regiao
 """
 
 def consultBase(consult):
@@ -113,18 +113,18 @@ if __name__ == '__main__':
     from tableau_api_lib import TableauServerConnection
     import pandas as pd
     import sqlite3
-    
+
     # ==== Base Filial ====
-    sainda_resumo = 'resumo_filial.hyper'
+    sainda_resumo = 'resumo.hyper'
     baseFilial = consultBase(filial)
-    connTableau(CONFIG, sainda_resumo, baseFilial, name = 'filialResumo')
+    connTableau(CONFIG, sainda_resumo, baseFilial, name = 'Resumo')
 
     # ==== Base Atividade ====
-    saida_atividade = 'atividade_filial.hyper'
+    saida_atividade = 'atividade.hyper'
     baseAtividade = consultBase(atividade)
-    connTableau(CONFIG, saida_atividade, baseAtividade, name = 'filialAtividade')
+    connTableau(CONFIG, saida_atividade, baseAtividade, name = 'Atividade')
 
     # ==== Base Regiao ====
-    saida_regiao = 'regiao_filial.hyper'
+    saida_regiao = 'regiao.hyper'
     baseRegiao = consultBase(regiao)
-    connTableau(CONFIG, saida_regiao, baseRegiao, name = 'filialRegiao')
+    connTableau(CONFIG, saida_regiao, baseRegiao, name = 'Regiao')
