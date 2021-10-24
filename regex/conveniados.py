@@ -1,3 +1,10 @@
+# Processo para extrair, atraves de uma lista nao estruturada de informacoes
+# de empresas conveniadas com o plano de saúde bradesco, um dataframe com
+# as informacoes estruturadas, forma tabelar, utilizando técnicas de expressões
+# regulares
+#
+# autor: Pablo Andreson
+
 CAMINHO_PDF = "regex/arquivos_entrada/Gmail - INDICAÇÃO DE LOCAL REFERENCIADO.pdf"
 
 def write_txt_list(list, filename):
