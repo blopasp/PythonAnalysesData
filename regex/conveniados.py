@@ -22,7 +22,7 @@ if __name__ == '__main__':
     texto = extract_from_pdf(CAMINHO_PDF)
 
     # Salvando arquivo original para um arquivo txt
-    with open('regex/arquivos_saida/conveniado.txt', 'a') as conv:
+    with open('regex/arquivos_saida/conveniado.txt', 'w') as conv:
         conv.write(texto)
 
     # procurando padrao nos bairros e nas quantidades de ocorrencias
@@ -32,8 +32,8 @@ if __name__ == '__main__':
     write_txt_list(bairros, 'regex/arquivos_saida/bairros.txt')
 
     # Procurando padrao para encontrar conveniada, endereco, complemento e bairro
-    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(|\s\W\d*)(\s\W\s[A-Z][A-Z ]+)', texto)
-    
+    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(\s[-]\s[S][L]+\s\d*|\s\W\d*|\s[-][S][A][L][A]+\s\d*|\s[S][A][L][A]+\s\d*|)(\s[-]\s[A-Z][A-Z ]+)', texto)
+
     # criando dicionario com os padroes encontrados
     cad = {
         'Conveniado':[row[0] for row in conveniados], 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # Tratando dataframe
     df['Conveniado'] = df['Conveniado'].apply(lambda x: x.replace('\n', ''))
     df['Cidade'] = df['Cidade'].apply(lambda x: x.replace(' - ', ''))
-    df['Complemento'] = df['Complemento'].apply(lambda x: x.replace('-', ''))
+    df['Complemento'] = df['Complemento'].apply(lambda x: x.replace('-', '').strip())
     df['Numero'] = df['Endereco'].apply(lambda x: x.split(',')[1])
     df['Numero'] = df['Numero'].apply(lambda x: x.split(' ')[2])
     df['Endereco'] = df['Endereco'].apply(lambda x: x.split(',')[0])
