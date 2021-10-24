@@ -39,37 +39,41 @@ if __name__ == '__main__':
     write_txt_list(bairros, 'regex/arquivos_saida/bairros.txt')
 
     # Procurando padrao para encontrar conveniada, endereco, complemento e bairro
-    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(\s[-]\s[S][L]+\s\d*|\s\W\d*|\s[-][S][A][L][A]+\s\d*|\s[S][A][L][A]+\s\d*|)(\s[-]\s[A-Z][A-Z ]+)([\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*)', texto)
-
-    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(\s[-]\s[S][L]+\s\d*|\s\W\d*|\s[-][S][A][L][A]+\s\d*|\s[S][A][L][A]+\s\d*|)(\s[-]\s[A-Z][A-Z ]+)([\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*|)', texto)
-
+    conveniados1 = re.findall(r'(\n[A-Z]+\s.+)(\n[A-Z].+[,]\s[N]\S\s\d*)(|.+[0-9]*.+)(\s[-]\s[A-Z][A-Z ]+)([\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*|)', texto)
+    conveniados2 = re.findall(r'(\n[A-Z]+.+)(\n[R][a][z].+.+)(\n[A-Z].+[,]\s[N]\S\s\d*)(|.+[0-9]*.+)(\s[-]\s[A-Z][A-Z ]+)([\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*|)', texto)
     
-    len(conveniados)
-    re.findall(r'|[\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*', texto)
-
     # criando dicionario com os padroes encontrados
-    cad = {
-        'Conveniado':[row[0] for row in conveniados], 
-        'Endereco':[row[1] for row in conveniados], 
-        'Complemento':[row[2] for row in conveniados], 
-        'Cidade':[row[3] for row in conveniados],
-        'Contato 1':[row[4] for row in conveniados]
+    cad1 = {
+        'Conveniado':[row[0] for row in conveniados1], 
+        'Endereco':[row[1] for row in conveniados1], 
+        'Complemento':[row[2] for row in conveniados1], 
+        'Bairro':[row[3] for row in conveniados1],
+        'Contato 1':[row[4] for row in conveniados1]
+    }
+
+    cad2 = {
+        'Conveniado':[row[0] for row in conveniados2], 
+        'Endereco':[row[2] for row in conveniados2], 
+        'Complemento':[row[3] for row in conveniados2], 
+        'Bairro':[row[4] for row in conveniados2],
+        'Contato 1':[row[5] for row in conveniados2]
     }
     # Criando um dataframe para 
-    df = pd.DataFrame(cad)
+    df = pd.concat([pd.DataFrame(cad1), pd.DataFrame(cad2)])
 
     # Tratando dataframe
     df['Conveniado'] = df['Conveniado'].apply(lambda x: x.replace('\n', ''))
-    df['Cidade'] = df['Cidade'].apply(lambda x: x.replace(' - ', ''))
+    df['Bairro'] = df['Bairro'].apply(lambda x: x.replace(' - ', '').strip())
     df['Complemento'] = df['Complemento'].apply(lambda x: x.replace('-', '').strip())
     df['Numero'] = df['Endereco'].apply(lambda x: x.split(',')[1])
     df['Numero'] = df['Numero'].apply(lambda x: x.split(' ')[2])
-    df['Endereco'] = df['Endereco'].apply(lambda x: x.split(',')[0])
+    df['Endereco'] = df['Endereco'].apply(lambda x: x.replace('\n', '').split(',')[0])
     df['Contato 2'] = df['Contato 1'].apply(lambda x: x.split(' / ')[1].strip() if len(x.split(' / ')) == 2 else '')
     df['Contato 1'] = df['Contato 1'].apply(lambda x: x.replace('\n', '')\
         .split(' / ')[0]\
         .strip() if len(x.split(' / ')) == 2 else x.replace('\n', '').strip())
 
     # Reordenando as colunas e salvando o arquivo
-    df = df[['Conveniado', 'Endereco', 'Numero', 'Complemento', 'Cidade', 'Contato 1', 'Contato 2']]
+    df = df[['Conveniado', 'Endereco', 'Numero', 'Complemento', 'Bairro', 'Contato 1', 'Contato 2']]
+    
     df.to_csv('regex/arquivos_saida/Conveniado.csv', index=False)
