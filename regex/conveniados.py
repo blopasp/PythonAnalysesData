@@ -39,14 +39,21 @@ if __name__ == '__main__':
     write_txt_list(bairros, 'regex/arquivos_saida/bairros.txt')
 
     # Procurando padrao para encontrar conveniada, endereco, complemento e bairro
-    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(\s[-]\s[S][L]+\s\d*|\s\W\d*|\s[-][S][A][L][A]+\s\d*|\s[S][A][L][A]+\s\d*|)(\s[-]\s[A-Z][A-Z ]+)', texto)
+    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(\s[-]\s[S][L]+\s\d*|\s\W\d*|\s[-][S][A][L][A]+\s\d*|\s[S][A][L][A]+\s\d*|)(\s[-]\s[A-Z][A-Z ]+)([\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*)', texto)
+
+    conveniados = re.findall(r'([A-Z][A-Z ]+\s)([A-Z ]+[,]\s[N]\S\s\d*)(\s[-]\s[S][L]+\s\d*|\s\W\d*|\s[-][S][A][L][A]+\s\d*|\s[S][A][L][A]+\s\d*|)(\s[-]\s[A-Z][A-Z ]+)([\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*|)', texto)
+
+    
+    len(conveniados)
+    re.findall(r'|[\n]\W\d{2}\W\s\d*[-]\d*\s\W\s\W\d{2}\W\s\d*[-]\d*|[\n]\W\d{2}\W\s\d*[-]\d*', texto)
 
     # criando dicionario com os padroes encontrados
     cad = {
         'Conveniado':[row[0] for row in conveniados], 
         'Endereco':[row[1] for row in conveniados], 
         'Complemento':[row[2] for row in conveniados], 
-        'Cidade':[row[3] for row in conveniados]
+        'Cidade':[row[3] for row in conveniados],
+        'Contato 1':[row[4] for row in conveniados]
     }
     # Criando um dataframe para 
     df = pd.DataFrame(cad)
@@ -58,7 +65,11 @@ if __name__ == '__main__':
     df['Numero'] = df['Endereco'].apply(lambda x: x.split(',')[1])
     df['Numero'] = df['Numero'].apply(lambda x: x.split(' ')[2])
     df['Endereco'] = df['Endereco'].apply(lambda x: x.split(',')[0])
+    df['Contato 2'] = df['Contato 1'].apply(lambda x: x.split(' / ')[1].strip() if len(x.split(' / ')) == 2 else '')
+    df['Contato 1'] = df['Contato 1'].apply(lambda x: x.replace('\n', '')\
+        .split(' / ')[0]\
+        .strip() if len(x.split(' / ')) == 2 else x.replace('\n', '').strip())
 
     # Reordenando as colunas e salvando o arquivo
-    df = df[['Conveniado', 'Endereco', 'Numero', 'Complemento', 'Cidade']]
+    df = df[['Conveniado', 'Endereco', 'Numero', 'Complemento', 'Cidade', 'Contato 1', 'Contato 2']]
     df.to_csv('regex/arquivos_saida/Conveniado.csv', index=False)
